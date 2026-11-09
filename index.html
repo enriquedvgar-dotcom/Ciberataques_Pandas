@@ -27,41 +27,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -76,15 +41,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="index_files/libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="index_files/libs/bootstrap/bootstrap-3a439d6a13688a944202f1a43faf92c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="index_files/libs/bootstrap/bootstrap-ef5b1c3c187578527ba66e1a97057f3c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<style>html{ scroll-behavior: smooth; }</style>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
-<body class="fullcontent quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
+<body class="quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
-<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">Índice de Contenidos</h2>
+   
+  <ul>
+  <li><a href="#introducción-y-contextualización-del-dataset" id="toc-introducción-y-contextualización-del-dataset" class="nav-link active" data-scroll-target="#introducción-y-contextualización-del-dataset"><span class="header-section-number">0.1</span> 1. Introducción y Contextualización del Dataset</a>
+  <ul class="collapse">
+  <li><a href="#variables-clave-del-dataset" id="toc-variables-clave-del-dataset" class="nav-link" data-scroll-target="#variables-clave-del-dataset"><span class="header-section-number">0.1.1</span> 📌 Variables Clave del Dataset</a></li>
+  </ul></li>
+  <li><a href="#exploración-inicial-y-calidad-de-datos-eda" id="toc-exploración-inicial-y-calidad-de-datos-eda" class="nav-link" data-scroll-target="#exploración-inicial-y-calidad-de-datos-eda"><span class="header-section-number">0.2</span> 2. Exploración Inicial y Calidad de Datos (EDA)</a></li>
+  <li><a href="#descarga-y-localización-automática-del-dataset-desde-kaggle" id="toc-descarga-y-localización-automática-del-dataset-desde-kaggle" class="nav-link" data-scroll-target="#descarga-y-localización-automática-del-dataset-desde-kaggle"><span class="header-section-number">1</span> 1. Descarga y localización automática del dataset desde Kaggle</a></li>
+  <li><a href="#carga-del-dataframe" id="toc-carga-del-dataframe" class="nav-link" data-scroll-target="#carga-del-dataframe"><span class="header-section-number">2</span> 2. Carga del DataFrame</a></li>
+  <li><a href="#estructura-general-del-dataset-tipos-de-datos-y-memoria" id="toc-estructura-general-del-dataset-tipos-de-datos-y-memoria" class="nav-link" data-scroll-target="#estructura-general-del-dataset-tipos-de-datos-y-memoria"><span class="header-section-number">3</span> 3. Estructura general del dataset (tipos de datos y memoria)</a></li>
+  <li><a href="#verificación-de-valores-nulos-o-incompletos" id="toc-verificación-de-valores-nulos-o-incompletos" class="nav-link" data-scroll-target="#verificación-de-valores-nulos-o-incompletos"><span class="header-section-number">4</span> 4. Verificación de valores nulos o incompletos</a></li>
+  <li><a href="#detección-de-registros-duplicados" id="toc-detección-de-registros-duplicados" class="nav-link" data-scroll-target="#detección-de-registros-duplicados"><span class="header-section-number">5</span> 5. Detección de registros duplicados</a></li>
+  <li><a href="#resumen-estadístico-inicial-describe" id="toc-resumen-estadístico-inicial-describe" class="nav-link" data-scroll-target="#resumen-estadístico-inicial-describe"><span class="header-section-number">6</span> 6. Resumen estadístico inicial (describe)</a></li>
+  <li><a href="#agrupación-groupby-conteo-global-por-tipo-de-ataque" id="toc-agrupación-groupby-conteo-global-por-tipo-de-ataque" class="nav-link" data-scroll-target="#agrupación-groupby-conteo-global-por-tipo-de-ataque"><span class="header-section-number">7</span> 1. Agrupación (groupby): Conteo global por tipo de ataque</a></li>
+  <li><a href="#tabla-dinámica-pivot_table-relación-cruzada-entre-tipo-de-ataque-y-acción-tomada" id="toc-tabla-dinámica-pivot_table-relación-cruzada-entre-tipo-de-ataque-y-acción-tomada" class="nav-link" data-scroll-target="#tabla-dinámica-pivot_table-relación-cruzada-entre-tipo-de-ataque-y-acción-tomada"><span class="header-section-number">8</span> 2. Tabla dinámica (pivot_table): Relación cruzada entre Tipo de Ataque y Acción Tomada</a></li>
+  <li><a href="#filtrado-avanzado-.loc-aislar-tráfico-dirigido-a-puertos-críticos-1024" id="toc-filtrado-avanzado-.loc-aislar-tráfico-dirigido-a-puertos-críticos-1024" class="nav-link" data-scroll-target="#filtrado-avanzado-.loc-aislar-tráfico-dirigido-a-puertos-críticos-1024"><span class="header-section-number">9</span> 3. Filtrado avanzado (.loc): Aislar tráfico dirigido a puertos críticos (&lt;= 1024)</a></li>
+  <li><a href="#configuración-del-tema-gráfico" id="toc-configuración-del-tema-gráfico" class="nav-link" data-scroll-target="#configuración-del-tema-gráfico"><span class="header-section-number">10</span> Configuración del tema gráfico</a></li>
+  <li><a href="#gráfico-1-distribución-por-tipo-de-ataque-con-recuento-exacto" id="toc-gráfico-1-distribución-por-tipo-de-ataque-con-recuento-exacto" class="nav-link" data-scroll-target="#gráfico-1-distribución-por-tipo-de-ataque-con-recuento-exacto"><span class="header-section-number">11</span> Gráfico 1: Distribución por Tipo de Ataque con recuento exacto</a></li>
+  <li><a href="#etiquetas-numéricas-en-el-extremo-de-cada-barra" id="toc-etiquetas-numéricas-en-el-extremo-de-cada-barra" class="nav-link" data-scroll-target="#etiquetas-numéricas-en-el-extremo-de-cada-barra"><span class="header-section-number">12</span> Etiquetas numéricas en el extremo de cada barra</a></li>
+  <li><a href="#gráfico-2-frecuencia-según-el-nivel-de-severidad" id="toc-gráfico-2-frecuencia-según-el-nivel-de-severidad" class="nav-link" data-scroll-target="#gráfico-2-frecuencia-según-el-nivel-de-severidad"><span class="header-section-number">13</span> Gráfico 2: Frecuencia según el Nivel de Severidad</a></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
 <main class="content" id="quarto-document-content" tabindex="-1">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -112,194 +134,77 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="análisis-avanzado-con-pandas-exploración-y-limpieza-eda" class="level2">
-<h2 class="anchored" data-anchor-id="análisis-avanzado-con-pandas-exploración-y-limpieza-eda">1. Análisis Avanzado con Pandas: Exploración y Limpieza (EDA)</h2>
-<p>En esta sección inicial, descargamos y cargamos el dataset de ciberseguridad para verificar su integridad, tipos de datos, nulos y duplicados, cumpliendo con los estándares de la guía oficial de Pandas.</p>
-<div id="b2366bb5" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> kagglehub</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> glob</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Descarga y localización automática del dataset</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> kagglehub.dataset_download(<span class="st">"teamincribo/cyber-security-attacks"</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>csv_files <span class="op">=</span> glob.glob(os.path.join(path, <span class="st">"**"</span>, <span class="st">"*.csv"</span>), recursive<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>csv_file_path <span class="op">=</span> csv_files[<span class="dv">0</span>]</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Archivo cargado correctamente: </span><span class="sc">{</span>os<span class="sc">.</span>path<span class="sc">.</span>basename(csv_file_path)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Carga del DataFrame</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(csv_file_path)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Estructura y tipos de datos (info)</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- ESTRUCTURA GENERAL DEL DATASET ---"</span>)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.info())</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Detección de valores nulos</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- COMPROBACIÓN DE VALORES NULOS ---"</span>)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.isnull().<span class="bu">sum</span>())</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Detección de registros duplicados</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- COMPROBACIÓN DE DUPLICADOS ---"</span>)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Número de filas duplicadas: </span><span class="sc">{</span>df<span class="sc">.</span>duplicated()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Resumen estadístico general (describe)</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- DESCRIPCIÓN ESTADÍSTICA GENERAL ---"</span>)</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.describe()) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Archivo cargado correctamente: cybersecurity_attacks.csv
-
---- ESTRUCTURA GENERAL DEL DATASET ---
-&lt;class 'pandas.DataFrame'&gt;
-RangeIndex: 40000 entries, 0 to 39999
-Data columns (total 25 columns):
- #   Column                  Non-Null Count  Dtype  
----  ------                  --------------  -----  
- 0   Timestamp               40000 non-null  str    
- 1   Source IP Address       40000 non-null  str    
- 2   Destination IP Address  40000 non-null  str    
- 3   Source Port             40000 non-null  int64  
- 4   Destination Port        40000 non-null  int64  
- 5   Protocol                40000 non-null  str    
- 6   Packet Length           40000 non-null  int64  
- 7   Packet Type             40000 non-null  str    
- 8   Traffic Type            40000 non-null  str    
- 9   Payload Data            40000 non-null  str    
- 10  Malware Indicators      20000 non-null  str    
- 11  Anomaly Scores          40000 non-null  float64
- 12  Alerts/Warnings         19933 non-null  str    
- 13  Attack Type             40000 non-null  str    
- 14  Attack Signature        40000 non-null  str    
- 15  Action Taken            40000 non-null  str    
- 16  Severity Level          40000 non-null  str    
- 17  User Information        40000 non-null  str    
- 18  Device Information      40000 non-null  str    
- 19  Network Segment         40000 non-null  str    
- 20  Geo-location Data       40000 non-null  str    
- 21  Proxy Information       20149 non-null  str    
- 22  Firewall Logs           20039 non-null  str    
- 23  IDS/IPS Alerts          19950 non-null  str    
- 24  Log Source              40000 non-null  str    
-dtypes: float64(1), int64(3), str(21)
-memory usage: 7.6 MB
-None
-
---- COMPROBACIÓN DE VALORES NULOS ---
-Timestamp                     0
-Source IP Address             0
-Destination IP Address        0
-Source Port                   0
-Destination Port              0
-Protocol                      0
-Packet Length                 0
-Packet Type                   0
-Traffic Type                  0
-Payload Data                  0
-Malware Indicators        20000
-Anomaly Scores                0
-Alerts/Warnings           20067
-Attack Type                   0
-Attack Signature              0
-Action Taken                  0
-Severity Level                0
-User Information              0
-Device Information            0
-Network Segment               0
-Geo-location Data             0
-Proxy Information         19851
-Firewall Logs             19961
-IDS/IPS Alerts            20050
-Log Source                    0
-dtype: int64
-
---- COMPROBACIÓN DE DUPLICADOS ---
-Número de filas duplicadas: 0
-
---- DESCRIPCIÓN ESTADÍSTICA GENERAL ---
-        Source Port  Destination Port  Packet Length  Anomaly Scores
-count  40000.000000      40000.000000   40000.000000    40000.000000
-mean   32970.356450      33150.868650     781.452725       50.113473
-std    18560.425604      18574.668842     416.044192       28.853598
-min     1027.000000       1024.000000      64.000000        0.000000
-25%    16850.750000      17094.750000     420.000000       25.150000
-50%    32856.000000      33004.500000     782.000000       50.345000
-75%    48928.250000      49287.000000    1143.000000       75.030000
-max    65530.000000      65535.000000    1500.000000      100.000000</code></pre>
-</div>
-</div>
+<section id="introducción-y-contextualización-del-dataset" class="level2" data-number="0.1">
+<h2 data-number="0.1" class="anchored" data-anchor-id="introducción-y-contextualización-del-dataset"><span class="header-section-number">0.1</span> 1. Introducción y Contextualización del Dataset</h2>
+<p>En este proyecto de la asignatura de Administración de Sistemas (ASIR), realizamos un análisis exploratorio de datos (EDA) centrado en la monitorización y detección de tráfico malicioso en red. Para ello, utilizamos <strong>Pandas</strong>, <strong>Matplotlib</strong> y <strong>Seaborn</strong> en un entorno controlado con Python, integrando los resultados a través de <strong>Quarto</strong>.</p>
+<p>El conjunto de datos analizado proviene de la plataforma Kaggle (<em>Cyber Security Attacks</em>), diseñado para simular eventos de seguridad recopilados por sistemas de detección de intrusiones (IDS/IPS) y Firewalls en una infraestructura corporativa.</p>
+<section id="variables-clave-del-dataset" class="level3" data-number="0.1.1">
+<h3 data-number="0.1.1" class="anchored" data-anchor-id="variables-clave-del-dataset"><span class="header-section-number">0.1.1</span> 📌 Variables Clave del Dataset</h3>
+<p>Para contextualizar el análisis desde la perspectiva de un Administrador de Sistemas y Analista de SOC (Security Operations Center), se identifican las siguientes variables técnicas: * <strong>Timestamp</strong>: Marca temporal en la que se registra el evento de red. * <strong>Source IP Address / Destination IP Address</strong>: Direcciones IP de origen (potencial atacante) y destino (servidor o equipo de la red interna). * <strong>Source Port / Destination Port</strong>: Puertos lógicos de comunicación. Es vital diferenciar entre puertos efímeros y <strong>puertos bien conocidos (<span class="math inline">\(\le 1024\)</span>)</strong>, ya que estos últimos albergan servicios críticos (HTTP, HTTPS, SSH, FTP, DNS). * <strong>Attack Type</strong>: Tipología del incidente registrado (ej. <em>Malware</em>, <em>DDoS</em>, <em>Intrusion</em>). * <strong>Severity Level</strong>: Nivel de criticidad atribuido al evento (<em>Low</em>, <em>Medium</em>, <em>High</em>). * <strong>Action Taken</strong>: Respuesta o medida defensiva ejecutada por el sistema (<em>Blocked</em>, <em>Ignored</em>, <em>Logged</em>).</p>
+<hr>
 </section>
-<section id="análisis-técnico-agrupaciones-y-tablas-dinámicas" class="level2">
-<h2 class="anchored" data-anchor-id="análisis-técnico-agrupaciones-y-tablas-dinámicas">2. Análisis Técnico: Agrupaciones y Tablas Dinámicas</h2>
-<p>En esta sección aplicamos operaciones de análisis avanzado utilizando agrupaciones (<code>groupby</code>), tablas dinámicas (<code>pivot_table</code>) y filtrado condicional (<code>loc</code>) para extraer conclusiones del tráfico de ciberataques.</p>
-<div id="fb0e06ca" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Agrupación (groupby): Conteo de ataques según su tipo (Attack Type)</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- RESUMEN POR TIPO DE ATAQUE (groupby) ---"</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>attacks_by_type <span class="op">=</span> df.groupby(<span class="st">'Attack Type'</span>).size().reset_index(name<span class="op">=</span><span class="st">'Total_Ataques'</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(attacks_by_type)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Tabla dinámica (pivot_table): Cruce entre Tipo de Ataque y Acción Tomada (Action Taken)</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- TABLA DINÁMICA: ATAQUE VS ACCIÓN TOMADA ---"</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>pivot_action <span class="op">=</span> pd.pivot_table(</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    df, </span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span><span class="st">'Attack Type'</span>, </span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span><span class="st">'Action Taken'</span>, </span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    values<span class="op">=</span><span class="st">'Source Port'</span>, </span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span><span class="st">'count'</span>, </span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    fill_value<span class="op">=</span><span class="dv">0</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pivot_action)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Filtrado avanzado (loc): Aislar registros de alta severidad o un protocolo específico</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># (Filtramos, por ejemplo, los registros cuyo puerto de destino sea menor o igual a 1024 - puertos bien conocidos)</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>critical_attacks <span class="op">=</span> df.loc[df[<span class="st">'Destination Port'</span>] <span class="op">&lt;=</span> <span class="dv">1024</span>]</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">--- FILTRADO AVANZADO (.loc) ---"</span>)</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Número de ataques dirigidos a puertos &lt;= 1024: </span><span class="sc">{</span><span class="bu">len</span>(critical_attacks)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(critical_attacks[[<span class="st">'Timestamp'</span>, <span class="st">'Source IP Address'</span>, <span class="st">'Destination Port'</span>, <span class="st">'Attack Type'</span>]].head()) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
---- RESUMEN POR TIPO DE ATAQUE (groupby) ---
-  Attack Type  Total_Ataques
-0        DDoS          13428
-1   Intrusion          13265
-2     Malware          13307
-
---- TABLA DINÁMICA: ATAQUE VS ACCIÓN TOMADA ---
-Action Taken  Blocked  Ignored  Logged
-Attack Type                           
-DDoS             4533     4459    4436
-Intrusion        4553     4401    4311
-Malware          4443     4416    4448
-
---- FILTRADO AVANZADO (.loc) ---
-Número de ataques dirigidos a puertos &lt;= 1024: 1
-                 Timestamp Source IP Address  Destination Port Attack Type
-10551  2020-03-16 16:29:15    101.173.72.147              1024     Malware</code></pre>
-</div>
-</div>
 </section>
-<section id="visualización-de-datos" class="level2">
-<h2 class="anchored" data-anchor-id="visualización-de-datos">3. Visualización de Datos</h2>
-<p>En esta sección añadimos gráficos optimizados con etiquetas de valor para apreciar con precisión las pequeñas diferencias entre categorías.</p>
+<section id="exploración-inicial-y-calidad-de-datos-eda" class="level2" data-number="0.2">
+<h2 data-number="0.2" class="anchored" data-anchor-id="exploración-inicial-y-calidad-de-datos-eda"><span class="header-section-number">0.2</span> 2. Exploración Inicial y Calidad de Datos (EDA)</h2>
+<p>En esta primera fase se evalúa la integridad y consistencia del dataset. La presencia de registros duplicados o valores nulos no tratados en logs de auditoría puede distorsionar las métricas de incidentes e impactar en las políticas automatizadas de seguridad.</p>
+<p>import pandas as pd import kagglehub import glob import os</p>
+</section>
+<section id="descarga-y-localización-automática-del-dataset-desde-kaggle" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> 1. Descarga y localización automática del dataset desde Kaggle</h1>
+<p>path = kagglehub.dataset_download(“teamincribo/cyber-security-attacks”) csv_files = glob.glob(os.path.join(path, “**“,”*.csv”), recursive=True) csv_file_path = csv_files[0]</p>
+<p>print(f”Archivo cargado correctamente: {os.path.basename(csv_file_path)}“)</p>
+</section>
+<section id="carga-del-dataframe" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> 2. Carga del DataFrame</h1>
+<p>df = pd.read_csv(csv_file_path)</p>
+</section>
+<section id="estructura-general-del-dataset-tipos-de-datos-y-memoria" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> 3. Estructura general del dataset (tipos de datos y memoria)</h1>
+<p>print(“— ESTRUCTURA GENERAL DEL DATASET —”) print(df.info())</p>
+</section>
+<section id="verificación-de-valores-nulos-o-incompletos" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> 4. Verificación de valores nulos o incompletos</h1>
+<p>print(“— COMPROBACIÓN DE VALORES NULOS —”) print(df.isnull().sum())</p>
+</section>
+<section id="detección-de-registros-duplicados" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> 5. Detección de registros duplicados</h1>
+<p>print(“— COMPROBACIÓN DE DUPLICADOS —”) print(f”Número de filas duplicadas: {df.duplicated().sum()}“)</p>
+</section>
+<section id="resumen-estadístico-inicial-describe" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> 6. Resumen estadístico inicial (describe)</h1>
+<p>print(“— DESCRIPCIÓN ESTADÍSTICA GENERAL —”) print(df.describe())</p>
+</section>
+<section id="agrupación-groupby-conteo-global-por-tipo-de-ataque" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> 1. Agrupación (groupby): Conteo global por tipo de ataque</h1>
+<p>print(“— RESUMEN POR TIPO DE ATAQUE (groupby) —”) attacks_by_type = df.groupby(‘Attack Type’).size().reset_index(name=‘Total_Ataques’) print(attacks_by_type)</p>
+</section>
+<section id="tabla-dinámica-pivot_table-relación-cruzada-entre-tipo-de-ataque-y-acción-tomada" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> 2. Tabla dinámica (pivot_table): Relación cruzada entre Tipo de Ataque y Acción Tomada</h1>
+<p>print(“— TABLA DINÁMICA: ATAQUE VS ACCIÓN TOMADA —”) pivot_action = pd.pivot_table( df, index=‘Attack Type’, columns=‘Action Taken’, values=‘Source Port’, aggfunc=‘count’, fill_value=0 ) print(pivot_action)</p>
+</section>
+<section id="filtrado-avanzado-.loc-aislar-tráfico-dirigido-a-puertos-críticos-1024" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> 3. Filtrado avanzado (.loc): Aislar tráfico dirigido a puertos críticos (&lt;= 1024)</h1>
+<p>critical_attacks = df.loc[df[‘Destination Port’] &lt;= 1024] print(f”— FILTRADO AVANZADO (.loc) —“) print(f”Número de ataques dirigidos a puertos bien conocidos (&lt;= 1024): {len(critical_attacks)}“) print(critical_attacks[[‘Timestamp’, ‘Source IP Address’, ‘Destination Port’, ‘Attack Type’]].head())</p>
 <p>import matplotlib.pyplot as plt import seaborn as sns</p>
 </section>
-<section id="configuramos-el-estilo-visual" class="level1">
-<h1>Configuramos el estilo visual</h1>
+<section id="configuración-del-tema-gráfico" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Configuración del tema gráfico</h1>
 <p>sns.set_theme(style=“whitegrid”)</p>
 </section>
-<section id="gráfico-1-conteo-de-ataques-por-tipo-con-etiquetas-de-datos-numéricos" class="level1">
-<h1>Gráfico 1: Conteo de ataques por tipo con etiquetas de datos numéricos</h1>
-<p>plt.figure(figsize=(10, 5)) ax = sns.countplot(data=df, y=‘Attack Type’, order=df[‘Attack Type’].value_counts().index, palette=‘viridis’)</p>
+<section id="gráfico-1-distribución-por-tipo-de-ataque-con-recuento-exacto" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> Gráfico 1: Distribución por Tipo de Ataque con recuento exacto</h1>
+<p>plt.figure(figsize=(10, 5)) ax = sns.countplot( data=df, y=‘Attack Type’, order=df[‘Attack Type’].value_counts().index, palette=‘viridis’ )</p>
 </section>
-<section id="añadir-los-valores-exactos-al-final-de-cada-barra" class="level1">
-<h1>Añadir los valores exactos al final de cada barra</h1>
+<section id="etiquetas-numéricas-en-el-extremo-de-cada-barra" class="level1" data-number="12">
+<h1 data-number="12"><span class="header-section-number">12</span> Etiquetas numéricas en el extremo de cada barra</h1>
 <p>for p in ax.patches: width = p.get_width() ax.annotate(f’{int(width):,}‘, (width, p.get_y() + p.get_height() / 2.), ha=’left’, va=‘center’, fontsize=11, color=‘black’, xytext=(5, 0), textcoords=‘offset points’)</p>
-<p>plt.title(‘Distribución de Ataques por Tipo (Conteo Exacto)’) plt.xlabel(‘Número de Registros’) plt.ylabel(‘Tipo de Ataque’) # Ajustamos ligeramente el límite del eje X para que los números no queden cortados plt.xlim(0, max(df[‘Attack Type’].value_counts()) * 1.1) plt.tight_layout() plt.show()</p>
+<p>plt.title(‘Distribución de Ataques por Tipo (Conteo Exacto)’, fontsize=14, pad=15) plt.xlabel(‘Número de Registros’, fontsize=12) plt.ylabel(‘Tipo de Ataque’, fontsize=12) plt.xlim(0, max(df[‘Attack Type’].value_counts()) * 1.15) plt.tight_layout() plt.show()</p>
 </section>
-<section id="gráfico-2-frecuencia-según-el-nivel-de-severidad-con-etiquetas" class="level1">
-<h1>Gráfico 2: Frecuencia según el Nivel de Severidad con etiquetas</h1>
-<p>plt.figure(figsize=(8, 5)) ax2 = sns.countplot(data=df, x=‘Severity Level’, palette=‘Set2’)</p>
+<section id="gráfico-2-frecuencia-según-el-nivel-de-severidad" class="level1" data-number="13">
+<h1 data-number="13"><span class="header-section-number">13</span> Gráfico 2: Frecuencia según el Nivel de Severidad</h1>
+<p>plt.figure(figsize=(8, 5)) ax2 = sns.countplot( data=df, x=‘Severity Level’, palette=‘Set2’ )</p>
 <p>for p in ax2.patches: height = p.get_height() ax2.annotate(f’{int(height):,}‘, (p.get_x() + p.get_width() / 2., height), ha=’center’, va=‘bottom’, fontsize=11, color=‘black’, xytext=(0, 5), textcoords=‘offset points’)</p>
-<p>plt.title(‘Frecuencia según el Nivel de Severidad’) plt.xlabel(‘Nivel de Severidad’) plt.ylabel(‘Cantidad’) plt.ylim(0, max(df[‘Severity Level’].value_counts()) * 1.1) plt.tight_layout() plt.show()</p>
+<p>plt.title(‘Frecuencia de Eventos según el Nivel de Severidad’, fontsize=14, pad=15) plt.xlabel(‘Nivel de Severidad’, fontsize=12) plt.ylabel(‘Cantidad de Incidentes’, fontsize=12) plt.ylim(0, max(df[‘Severity Level’].value_counts()) * 1.15) plt.tight_layout() plt.show()</p>
 </section>
 
 </main>
@@ -785,4 +690,5 @@ Número de ataques dirigidos a puertos &lt;= 1024: 1
 
 
 
+<script src="index_files/libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

@@ -1,12 +1,38 @@
 ---
 title: "Trabajo 1: Análisis de Ciberataques"
 author: "Aarón Fernández, Iván Gómez y Enrique de Vicente"
-format: html
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-location: left
+    toc-title: "Índice de Contenidos"
+    code-fold: true
+    code-summary: "Desplegar código Python"
+    number-sections: true
+    smooth-scroll: true
 ---
 
-## 1. Análisis Avanzado con Pandas: Exploración y Limpieza (EDA)
+## 1. Introducción y Contextualización del Dataset
 
-En esta sección inicial, descargamos y cargamos el dataset de ciberseguridad para verificar su integridad, tipos de datos, nulos y duplicados, cumpliendo con los estándares de la guía oficial de Pandas.
+En este proyecto de la asignatura de Administración de Sistemas (ASIR), realizamos un análisis exploratorio de datos (EDA) centrado en la monitorización y detección de tráfico malicioso en red. Para ello, utilizamos **Pandas**, **Matplotlib** y **Seaborn** en un entorno controlado con Python, integrando los resultados a través de **Quarto**.
+
+El conjunto de datos analizado proviene de la plataforma Kaggle (*Cyber Security Attacks*), diseñado para simular eventos de seguridad recopilados por sistemas de detección de intrusiones (IDS/IPS) y Firewalls en una infraestructura corporativa.
+
+### 📌 Variables Clave del Dataset
+Para contextualizar el análisis desde la perspectiva de un Administrador de Sistemas y Analista de SOC (Security Operations Center), se identifican las siguientes variables técnicas:
+* **Timestamp**: Marca temporal en la que se registra el evento de red.
+* **Source IP Address / Destination IP Address**: Direcciones IP de origen (potencial atacante) y destino (servidor o equipo de la red interna).
+* **Source Port / Destination Port**: Puertos lógicos de comunicación. Es vital diferenciar entre puertos efímeros y **puertos bien conocidos ($\le 1024$)**, ya que estos últimos albergan servicios críticos (HTTP, HTTPS, SSH, FTP, DNS).
+* **Attack Type**: Tipología del incidente registrado (ej. *Malware*, *DDoS*, *Intrusion*).
+* **Severity Level**: Nivel de criticidad atribuido al evento (*Low*, *Medium*, *High*).
+* **Action Taken**: Respuesta o medida defensiva ejecutada por el sistema (*Blocked*, *Ignored*, *Logged*).
+
+---
+
+## 2. Exploración Inicial y Calidad de Datos (EDA)
+
+En esta primera fase se evalúa la integridad y consistencia del dataset. La presencia de registros duplicados o valores nulos no tratados en logs de auditoría puede distorsionar las métricas de incidentes e impactar en las políticas automatizadas de seguridad.
 
 ```{python}
 import pandas as pd
@@ -14,7 +40,7 @@ import kagglehub
 import glob
 import os
 
-# 1. Descarga y localización automática del dataset
+# 1. Descarga y localización automática del dataset desde Kaggle
 path = kagglehub.dataset_download("teamincribo/cyber-security-attacks")
 csv_files = glob.glob(os.path.join(path, "**", "*.csv"), recursive=True)
 csv_file_path = csv_files[0]
@@ -24,11 +50,11 @@ print(f"Archivo cargado correctamente: {os.path.basename(csv_file_path)}")
 # 2. Carga del DataFrame
 df = pd.read_csv(csv_file_path)
 
-# 3. Estructura y tipos de datos (info)
+# 3. Estructura general del dataset (tipos de datos y memoria)
 print("\n--- ESTRUCTURA GENERAL DEL DATASET ---")
 print(df.info())
 
-# 4. Detección de valores nulos
+# 4. Verificación de valores nulos o incompletos
 print("\n--- COMPROBACIÓN DE VALORES NULOS ---")
 print(df.isnull().sum())
 
@@ -36,21 +62,16 @@ print(df.isnull().sum())
 print("\n--- COMPROBACIÓN DE DUPLICADOS ---")
 print(f"Número de filas duplicadas: {df.duplicated().sum()}")
 
-# 6. Resumen estadístico general (describe)
+# 6. Resumen estadístico inicial (describe)
 print("\n--- DESCRIPCIÓN ESTADÍSTICA GENERAL ---")
-print(df.describe()) 
-```
-## 2. Análisis Técnico: Agrupaciones y Tablas Dinámicas
+print(df.describe())
 
-En esta sección aplicamos operaciones de análisis avanzado utilizando agrupaciones (`groupby`), tablas dinámicas (`pivot_table`) y filtrado condicional (`loc`) para extraer conclusiones del tráfico de ciberataques.
-
-```{python}
-# 1. Agrupación (groupby): Conteo de ataques según su tipo (Attack Type)
+# 1. Agrupación (groupby): Conteo global por tipo de ataque
 print("\n--- RESUMEN POR TIPO DE ATAQUE (groupby) ---")
 attacks_by_type = df.groupby('Attack Type').size().reset_index(name='Total_Ataques')
 print(attacks_by_type)
 
-# 2. Tabla dinámica (pivot_table): Cruce entre Tipo de Ataque y Acción Tomada (Action Taken)
+# 2. Tabla dinámica (pivot_table): Relación cruzada entre Tipo de Ataque y Acción Tomada
 print("\n--- TABLA DINÁMICA: ATAQUE VS ACCIÓN TOMADA ---")
 pivot_action = pd.pivot_table(
     df, 
@@ -62,31 +83,28 @@ pivot_action = pd.pivot_table(
 )
 print(pivot_action)
 
-# 3. Filtrado avanzado (loc): Aislar registros de alta severidad o un protocolo específico
-# (Filtramos, por ejemplo, los registros cuyo puerto de destino sea menor o igual a 1024 - puertos bien conocidos)
+# 3. Filtrado avanzado (.loc): Aislar tráfico dirigido a puertos críticos (<= 1024)
 critical_attacks = df.loc[df['Destination Port'] <= 1024]
 print(f"\n--- FILTRADO AVANZADO (.loc) ---")
-print(f"Número de ataques dirigidos a puertos <= 1024: {len(critical_attacks)}")
-print(critical_attacks[['Timestamp', 'Source IP Address', 'Destination Port', 'Attack Type']].head()) 
-```
+print(f"Número de ataques dirigidos a puertos bien conocidos (<= 1024): {len(critical_attacks)}")
+print(critical_attacks[['Timestamp', 'Source IP Address', 'Destination Port', 'Attack Type']].head())
 
-
-## 3. Visualización de Datos
-
-En esta sección añadimos gráficos optimizados con etiquetas de valor para apreciar con precisión las pequeñas diferencias entre categorías.
-
-```{python}
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Configuramos el estilo visual
+# Configuración del tema gráfico
 sns.set_theme(style="whitegrid")
 
-# Gráfico 1: Conteo de ataques por tipo con etiquetas de datos numéricos
+# Gráfico 1: Distribución por Tipo de Ataque con recuento exacto
 plt.figure(figsize=(10, 5))
-ax = sns.countplot(data=df, y='Attack Type', order=df['Attack Type'].value_counts().index, palette='viridis')
+ax = sns.countplot(
+    data=df, 
+    y='Attack Type', 
+    order=df['Attack Type'].value_counts().index, 
+    palette='viridis'
+)
 
-# Añadir los valores exactos al final de cada barra
+# Etiquetas numéricas en el extremo de cada barra
 for p in ax.patches:
     width = p.get_width()
     ax.annotate(f'{int(width):,}',
@@ -95,17 +113,20 @@ for p in ax.patches:
                 fontsize=11, color='black',
                 xytext=(5, 0), textcoords='offset points')
 
-plt.title('Distribución de Ataques por Tipo (Conteo Exacto)')
-plt.xlabel('Número de Registros')
-plt.ylabel('Tipo de Ataque')
-# Ajustamos ligeramente el límite del eje X para que los números no queden cortados
-plt.xlim(0, max(df['Attack Type'].value_counts()) * 1.1)
+plt.title('Distribución de Ataques por Tipo (Conteo Exacto)', fontsize=14, pad=15)
+plt.xlabel('Número de Registros', fontsize=12)
+plt.ylabel('Tipo de Ataque', fontsize=12)
+plt.xlim(0, max(df['Attack Type'].value_counts()) * 1.15)
 plt.tight_layout()
 plt.show()
 
-# Gráfico 2: Frecuencia según el Nivel de Severidad con etiquetas
+# Gráfico 2: Frecuencia según el Nivel de Severidad
 plt.figure(figsize=(8, 5))
-ax2 = sns.countplot(data=df, x='Severity Level', palette='Set2')
+ax2 = sns.countplot(
+    data=df, 
+    x='Severity Level', 
+    palette='Set2'
+)
 
 for p in ax2.patches:
     height = p.get_height()
@@ -115,9 +136,9 @@ for p in ax2.patches:
                 fontsize=11, color='black',
                 xytext=(0, 5), textcoords='offset points')
 
-plt.title('Frecuencia según el Nivel de Severidad')
-plt.xlabel('Nivel de Severidad')
-plt.ylabel('Cantidad')
-plt.ylim(0, max(df['Severity Level'].value_counts()) * 1.1)
+plt.title('Frecuencia de Eventos según el Nivel de Severidad', fontsize=14, pad=15)
+plt.xlabel('Nivel de Severidad', fontsize=12)
+plt.ylabel('Cantidad de Incidentes', fontsize=12)
+plt.ylim(0, max(df['Severity Level'].value_counts()) * 1.15)
 plt.tight_layout()
 plt.show()
