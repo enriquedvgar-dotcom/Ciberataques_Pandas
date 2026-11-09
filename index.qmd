@@ -1,38 +1,61 @@
 ---
 title: "Trabajo 1: Análisis de Ciberataques"
+subtitle: "Auditoría y análisis de datos de ciberseguridad"
 author: "Aarón Fernández, Iván Gómez y Enrique de Vicente"
+lang: es
 format:
   html:
-    theme: cosmo
+    theme:
+      light: cosmo
+      dark: cyborg
     toc: true
     toc-location: left
-    toc-title: "Índice de Contenidos"
+    toc-title: "Tabla de contenidos"
     code-fold: true
-    code-summary: "Desplegar código Python"
+    code-summary: "Mostrar código"
     number-sections: true
     smooth-scroll: true
+    search: true
+    page-layout: full
+execute:
+  echo: true
+  warning: false
+  message: false
 ---
 
-## 1. Introducción y Contextualización del Dataset
+## 1. Introducción
 
-En este proyecto de la asignatura de Administración de Sistemas (ASIR), realizamos un análisis exploratorio de datos (EDA) centrado en la monitorización y detección de tráfico malicioso en red. Para ello, utilizamos **Pandas**, **Matplotlib** y **Seaborn** en un entorno controlado con Python, integrando los resultados a través de **Quarto**.
+En este proyecto de la asignatura de Administración de Sistemas Informáticos en Red (ASIR), desarrollamos un informe técnico de ciberseguridad mediante el análisis de un conjunto de datos relacionado con ataques informáticos y actividad de red.
 
-El conjunto de datos analizado proviene de la plataforma Kaggle (*Cyber Security Attacks*), diseñado para simular eventos de seguridad recopilados por sistemas de detección de intrusiones (IDS/IPS) y Firewalls en una infraestructura corporativa.
+Utilizamos Python y las librerías **Pandas**, **Matplotlib**, **Seaborn** y **Plotly**. El informe se genera con **Quarto**, lo que permite combinar código, resultados, gráficos e interpretación técnica en una página web reproducible.
 
-### 📌 Variables Clave del Dataset
-Para contextualizar el análisis desde la perspectiva de un Administrador de Sistemas y Analista de SOC (Security Operations Center), se identifican las siguientes variables técnicas:
-* **Timestamp**: Marca temporal en la que se registra el evento de red.
-* **Source IP Address / Destination IP Address**: Direcciones IP de origen (potencial atacante) y destino (servidor o equipo de la red interna).
-* **Source Port / Destination Port**: Puertos lógicos de comunicación. Es vital diferenciar entre puertos efímeros y **puertos bien conocidos ($\le 1024$)**, ya que estos últimos albergan servicios críticos (HTTP, HTTPS, SSH, FTP, DNS).
-* **Attack Type**: Tipología del incidente registrado (ej. *Malware*, *DDoS*, *Intrusion*).
-* **Severity Level**: Nivel de criticidad atribuido al evento (*Low*, *Medium*, *High*).
-* **Action Taken**: Respuesta o medida defensiva ejecutada por el sistema (*Blocked*, *Ignored*, *Logged*).
+El objetivo es demostrar cómo un administrador de sistemas puede procesar datos de seguridad, estudiar incidentes, localizar patrones y obtener información que ayude a priorizar tareas de supervisión y protección.
 
----
+## 2. Descripción del conjunto de datos
 
-## 2. Exploración Inicial y Calidad de Datos (EDA)
+El conjunto de datos procede de Kaggle y se denomina *Cyber Security Attacks*, publicado por Incribo.
 
-En esta primera fase se evalúa la integridad y consistencia del dataset. La presencia de registros duplicados o valores nulos no tratados en logs de auditoría puede distorsionar las métricas de incidentes e impactar en las políticas automatizadas de seguridad.
+Es un conjunto de datos sintético que representa distintos escenarios de ciberseguridad. Por tanto, sus registros permiten practicar el análisis, pero no deben presentarse como mediciones reales de una empresa ni como una muestra representativa de todas las redes.
+
+### 2.1. Variables principales
+
+| Variable | Descripción |
+|---|---|
+| `Timestamp` | Fecha y hora asociadas al evento. |
+| `Source IP Address` | Dirección IP de origen. |
+| `Destination IP Address` | Dirección IP de destino. |
+| `Source Port` | Puerto de origen. |
+| `Destination Port` | Puerto de destino. |
+| `Protocol` | Protocolo de comunicación. |
+| `Packet Length` | Longitud del paquete registrada. |
+| `Attack Type` | Tipo de ataque o categoría del evento. |
+| `Severity Level` | Nivel de severidad asignado. |
+| `Action Taken` | Acción defensiva registrada. |
+| `Anomaly Scores` | Puntuación de anomalía del registro. |
+
+## 3. Carga e integración de los datos
+
+En esta sección descargamos el conjunto de datos desde Kaggle y localizamos los archivos CSV disponibles. Comprobamos sus nombres antes de cargarlos para evitar seleccionar accidentalmente un archivo distinto del esperado.
 
 ```{python}
 import pandas as pd
@@ -40,105 +63,437 @@ import kagglehub
 import glob
 import os
 
-# 1. Descarga y localización automática del dataset desde Kaggle
-path = kagglehub.dataset_download("teamincribo/cyber-security-attacks")
-csv_files = glob.glob(os.path.join(path, "**", "*.csv"), recursive=True)
-csv_file_path = csv_files[0]
+# Descarga del dataset
+path = kagglehub.dataset_download(
+    "teamincribo/cyber-security-attacks"
+)
 
-print(f"Archivo cargado correctamente: {os.path.basename(csv_file_path)}")
+# Localización de los archivos CSV
+csv_files = sorted(
+    glob.glob(os.path.join(path, "**", "*.csv"), recursive=True)
+)
 
-# 2. Carga del DataFrame
-df = pd.read_csv(csv_file_path)
+print("Archivos CSV encontrados:")
+for archivo in csv_files:
+    print(os.path.basename(archivo))
 
-# 3. Estructura general del dataset (tipos de datos y memoria)
-print("\n--- ESTRUCTURA GENERAL DEL DATASET ---")
-print(df.info())
+if not csv_files:
+    raise FileNotFoundError("No se ha encontrado ningún archivo CSV")
 
-# 4. Verificación de valores nulos o incompletos
-print("\n--- COMPROBACIÓN DE VALORES NULOS ---")
-print(df.isnull().sum())
+# Identificamos los CSV que contienen las columnas principales esperadas.
+columnas_requeridas = {
+    "Timestamp", "Source IP Address", "Destination Port",
+    "Attack Type", "Severity Level", "Action Taken",
+    "Packet Length", "Anomaly Scores"
+}
 
-# 5. Detección de registros duplicados
-print("\n--- COMPROBACIÓN DE DUPLICADOS ---")
-print(f"Número de filas duplicadas: {df.duplicated().sum()}")
+archivos_validos = []
+for archivo in csv_files:
+    muestra = pd.read_csv(archivo, nrows=5)
+    if columnas_requeridas.issubset(set(muestra.columns)):
+        archivos_validos.append(archivo)
 
-# 6. Resumen estadístico inicial (describe)
-print("\n--- DESCRIPCIÓN ESTADÍSTICA GENERAL ---")
-print(df.describe())
+if not archivos_validos:
+    raise ValueError(
+        "No se ha encontrado un CSV con las columnas esperadas. "
+        "Revisa los archivos descargados y sus nombres de columnas."
+    )
 
-# 1. Agrupación (groupby): Conteo global por tipo de ataque
-print("\n--- RESUMEN POR TIPO DE ATAQUE (groupby) ---")
-attacks_by_type = df.groupby('Attack Type').size().reset_index(name='Total_Ataques')
-print(attacks_by_type)
+# Cargamos los archivos compatibles con el esquema esperado.
+dataframes = [pd.read_csv(archivo) for archivo in archivos_validos]
 
-# 2. Tabla dinámica (pivot_table): Relación cruzada entre Tipo de Ataque y Acción Tomada
-print("\n--- TABLA DINÁMICA: ATAQUE VS ACCIÓN TOMADA ---")
-pivot_action = pd.pivot_table(
-    df, 
-    index='Attack Type', 
-    columns='Action Taken', 
-    values='Source Port', 
-    aggfunc='count', 
+if len(dataframes) > 1 and all(
+    list(datos.columns) == list(dataframes[0].columns)
+    for datos in dataframes
+):
+    df = pd.concat(dataframes, ignore_index=True)
+    print(f"Se han concatenado {len(dataframes)} archivos CSV compatibles.")
+else:
+    df = dataframes[0].copy()
+    print("Se ha cargado el primer CSV compatible con las columnas esperadas.")
+
+print("Dimensiones iniciales:", df.shape)
+```
+
+### 3.1. Uso de concat() para reunir particiones
+
+`concat()` permite unir DataFrames con una estructura compatible. Si Kaggle proporciona varios CSV con las mismas columnas, el bloque anterior los reúne. Si solo hay un CSV, dividimos temporalmente sus filas en dos particiones y las volvemos a reunir para demostrar el funcionamiento de `concat()` sin inventar una segunda fuente de datos.
+
+**Nota metodológica:** esta segunda situación no equivale a integrar dos datasets independientes. Si se exige expresamente combinar dos fuentes distintas, habrá que incorporar un segundo conjunto de datos compatible y documentar su procedencia.
+
+```{python}
+mitad = len(df) // 2
+parte_1 = df.iloc[:mitad].copy()
+parte_2 = df.iloc[mitad:].copy()
+
+datos_unificados = pd.concat([parte_1, parte_2], ignore_index=True)
+
+print("Filas de la primera partición:", len(parte_1))
+print("Filas de la segunda partición:", len(parte_2))
+print("Filas después de concat():", len(datos_unificados))
+
+# Continuamos el análisis con el DataFrame unificado.
+df = datos_unificados
+```
+
+### 3.2. Exploración inicial
+
+Comprobamos las dimensiones, los nombres de las columnas, una muestra de registros y los tipos de datos.
+
+```{python}
+print("DIMENSIONES DEL DATASET")
+print(df.shape)
+
+print("\nNOMBRES DE LAS COLUMNAS")
+print(df.columns.tolist())
+
+print("\nPRIMERAS CINCO FILAS")
+display(df.head())
+
+print("\nINFORMACIÓN GENERAL")
+df.info()
+```
+
+## 4. Limpieza y preparación de los datos
+
+Antes de realizar el análisis estadístico, revisamos la calidad de los registros. La detección de valores ausentes, duplicados y tipos inesperados ayuda a evitar conclusiones basadas en datos incompletos o inconsistentes.
+
+### 4.1. Detección de valores nulos
+
+```{python}
+nulos = df.isnull().sum().sort_values(ascending=False)
+
+print("VALORES NULOS POR COLUMNA")
+display(nulos)
+print("Total de valores nulos:", int(df.isnull().sum().sum()))
+```
+
+### 4.2. Detección de registros duplicados
+
+```{python}
+duplicados = int(df.duplicated().sum())
+print("REGISTROS DUPLICADOS:", duplicados)
+```
+
+No eliminamos registros automáticamente: primero cuantificamos los duplicados para poder justificar cualquier decisión de limpieza y conservar la trazabilidad del análisis.
+
+### 4.3. Tipos de datos y fechas
+
+```{python}
+print("TIPOS DE DATOS DEL DATASET")
+display(df.dtypes)
+
+# Convertimos Timestamp a fecha si la columna está disponible.
+if "Timestamp" in df.columns:
+    df["Timestamp"] = pd.to_datetime(df["Timestamp"], errors="coerce")
+    print("Fechas que no se han podido interpretar:", int(df["Timestamp"].isna().sum()))
+```
+
+## 5. Exploración estadística (EDA)
+
+La exploración estadística permite conocer la distribución de las variables y detectar valores que merecen una revisión adicional. Presentamos al menos tres resúmenes sobre variables relevantes para el análisis de seguridad.
+
+### 5.1. Resumen estadístico de las variables numéricas
+
+```{python}
+display(df.describe(include="number").T)
+```
+
+### 5.2. Distribución de los tipos de ataque
+
+```{python}
+frecuencia_ataques = df["Attack Type"].value_counts(dropna=False)
+porcentaje_ataques = df["Attack Type"].value_counts(normalize=True, dropna=False).mul(100)
+resumen_ataques = pd.DataFrame({
+    "Registros": frecuencia_ataques,
+    "Porcentaje": porcentaje_ataques.round(2)
+})
+display(resumen_ataques)
+```
+
+### 5.3. Distribución de los niveles de severidad
+
+```{python}
+frecuencia_severidad = df["Severity Level"].value_counts(dropna=False)
+porcentaje_severidad = df["Severity Level"].value_counts(normalize=True, dropna=False).mul(100)
+resumen_severidad = pd.DataFrame({
+    "Registros": frecuencia_severidad,
+    "Porcentaje": porcentaje_severidad.round(2)
+})
+display(resumen_severidad)
+```
+
+### 5.4. Estadísticas de longitud de paquete y puntuación de anomalía
+
+```{python}
+variables_interes = [
+    columna for columna in ["Packet Length", "Anomaly Scores"]
+    if columna in df.columns
+]
+
+if variables_interes:
+    display(df[variables_interes].describe().T)
+else:
+    print("No se han encontrado las columnas numéricas esperadas.")
+```
+
+**Interpretación técnica:** la media y la mediana ayudan a describir los valores habituales, mientras que los máximos y percentiles permiten localizar registros extremos. Una puntuación de anomalía elevada o paquetes de tamaño atípico pueden justificar una inspección adicional, pero por sí solos no demuestran que exista un ataque.
+
+## 6. Análisis avanzado con Pandas
+
+En esta sección aplicamos agrupaciones, tablas dinámicas y selección avanzada para responder preguntas relacionadas con la actividad y la gestión de incidentes.
+
+### 6.1. Agrupación por tipo de ataque con groupby()
+
+```{python}
+ataques_por_tipo = (
+    df.groupby("Attack Type", dropna=False)
+    .size()
+    .reset_index(name="Total de eventos")
+    .sort_values("Total de eventos", ascending=False)
+)
+
+display(ataques_por_tipo)
+```
+
+**Interpretación:** esta agrupación permite identificar qué categorías concentran más registros en el conjunto analizado. Las categorías con mayor frecuencia pueden priorizarse para una revisión, teniendo en cuenta que el dataset es sintético.
+
+### 6.2. Agrupación por nivel de severidad
+
+```{python}
+severidad = (
+    df.groupby("Severity Level", dropna=False)
+    .size()
+    .reset_index(name="Total de eventos")
+    .sort_values("Total de eventos", ascending=False)
+)
+
+display(severidad)
+```
+
+**Interpretación:** la agrupación permite comparar cuántos eventos se han clasificado en cada nivel. En un entorno real, los incidentes de severidad alta deberían revisarse según los procedimientos de respuesta establecidos.
+
+### 6.3. Tabla dinámica con pivot_table()
+
+```{python}
+tabla_dinamica = pd.pivot_table(
+    df,
+    index="Attack Type",
+    columns="Action Taken",
+    values="Destination Port",
+    aggfunc="count",
     fill_value=0
 )
-print(pivot_action)
 
-# 3. Filtrado avanzado (.loc): Aislar tráfico dirigido a puertos críticos (<= 1024)
-critical_attacks = df.loc[df['Destination Port'] <= 1024]
-print(f"\n--- FILTRADO AVANZADO (.loc) ---")
-print(f"Número de ataques dirigidos a puertos bien conocidos (<= 1024): {len(critical_attacks)}")
-print(critical_attacks[['Timestamp', 'Source IP Address', 'Destination Port', 'Attack Type']].head())
+display(tabla_dinamica)
+```
 
+**Interpretación:** la tabla cruza el tipo de ataque con la acción defensiva registrada. Permite comparar el volumen de eventos asociados a cada acción, aunque no demuestra por sí sola que una acción haya sido eficaz.
+
+### 6.4. Filtrado avanzado con loc()
+
+Seleccionamos los eventos cuyo puerto de destino pertenece al rango de puertos bien conocidos, de 0 a 1023.
+
+```{python}
+puertos_bien_conocidos = df.loc[
+    df["Destination Port"].between(0, 1023),
+    [
+        "Timestamp",
+        "Source IP Address",
+        "Destination Port",
+        "Attack Type",
+        "Severity Level"
+    ]
+]
+
+print("EVENTOS EN PUERTOS BIEN CONOCIDOS:", len(puertos_bien_conocidos))
+display(puertos_bien_conocidos.head(10))
+```
+
+**Interpretación:** este filtro facilita revisar eventos dirigidos a servicios que suelen utilizar puertos conocidos. Que un puerto esté en ese rango no significa que sea vulnerable; es un criterio de selección para orientar la auditoría.
+
+### 6.5. Selección posicional con iloc()
+
+Utilizamos `iloc` para seleccionar las primeras diez filas y las primeras cinco columnas por su posición.
+
+```{python}
+muestra_posicional = df.iloc[0:10, 0:5]
+display(muestra_posicional)
+```
+
+**Interpretación:** `iloc` selecciona por posiciones numéricas, mientras que `loc` selecciona mediante etiquetas y condiciones. Ambas técnicas permiten inspeccionar subconjuntos concretos del DataFrame.
+
+## 7. Visualización de resultados
+
+Las visualizaciones facilitan la interpretación de los resultados. Utilizamos Matplotlib y Seaborn para los gráficos estáticos y Plotly para una visualización interactiva.
+
+```{python}
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Configuración del tema gráfico
 sns.set_theme(style="whitegrid")
+```
 
-# Gráfico 1: Distribución por Tipo de Ataque con recuento exacto
+### 7.1. Distribución de ataques por tipo
+
+```{python}
 plt.figure(figsize=(10, 5))
+orden_ataques = df["Attack Type"].value_counts().index
+
 ax = sns.countplot(
-    data=df, 
-    y='Attack Type', 
-    order=df['Attack Type'].value_counts().index, 
-    palette='viridis'
+    data=df,
+    y="Attack Type",
+    order=orden_ataques,
+    hue="Attack Type",
+    palette="viridis",
+    legend=False
 )
 
-# Etiquetas numéricas en el extremo de cada barra
-for p in ax.patches:
-    width = p.get_width()
-    ax.annotate(f'{int(width):,}',
-                (width, p.get_y() + p.get_height() / 2.),
-                ha='left', va='center',
-                fontsize=11, color='black',
-                xytext=(5, 0), textcoords='offset points')
+for barra in ax.patches:
+    ancho = barra.get_width()
+    ax.annotate(
+        f"{int(ancho):,}",
+        (ancho, barra.get_y() + barra.get_height() / 2),
+        xytext=(5, 0),
+        textcoords="offset points",
+        va="center"
+    )
 
-plt.title('Distribución de Ataques por Tipo (Conteo Exacto)', fontsize=14, pad=15)
-plt.xlabel('Número de Registros', fontsize=12)
-plt.ylabel('Tipo de Ataque', fontsize=12)
-plt.xlim(0, max(df['Attack Type'].value_counts()) * 1.15)
+plt.title("Distribución de ataques por tipo")
+plt.xlabel("Número de registros")
+plt.ylabel("Tipo de ataque")
 plt.tight_layout()
 plt.show()
+```
 
-# Gráfico 2: Frecuencia según el Nivel de Severidad
+**Interpretación:** el gráfico permite reconocer visualmente las categorías más frecuentes. La frecuencia indica cuántos registros hay de cada tipo, no la gravedad ni el impacto real de esos incidentes.
+
+### 7.2. Frecuencia según nivel de severidad
+
+```{python}
 plt.figure(figsize=(8, 5))
-ax2 = sns.countplot(
-    data=df, 
-    x='Severity Level', 
-    palette='Set2'
+orden_severidad = df["Severity Level"].value_counts().index
+
+ax = sns.countplot(
+    data=df,
+    x="Severity Level",
+    order=orden_severidad,
+    hue="Severity Level",
+    palette="Set2",
+    legend=False
 )
 
-for p in ax2.patches:
-    height = p.get_height()
-    ax2.annotate(f'{int(height):,}',
-                (p.get_x() + p.get_width() / 2., height),
-                ha='center', va='bottom',
-                fontsize=11, color='black',
-                xytext=(0, 5), textcoords='offset points')
+for barra in ax.patches:
+    alto = barra.get_height()
+    ax.annotate(
+        f"{int(alto):,}",
+        (barra.get_x() + barra.get_width() / 2, alto),
+        xytext=(0, 5),
+        textcoords="offset points",
+        ha="center"
+    )
 
-plt.title('Frecuencia de Eventos según el Nivel de Severidad', fontsize=14, pad=15)
-plt.xlabel('Nivel de Severidad', fontsize=12)
-plt.ylabel('Cantidad de Incidentes', fontsize=12)
-plt.ylim(0, max(df['Severity Level'].value_counts()) * 1.15)
+plt.title("Frecuencia según nivel de severidad")
+plt.xlabel("Nivel de severidad")
+plt.ylabel("Cantidad de eventos")
 plt.tight_layout()
 plt.show()
+```
+
+**Interpretación:** esta representación ayuda a comparar la distribución de severidad. En una operación real, la prioridad de respuesta debe considerar también el contexto, los activos afectados y la información adicional del incidente.
+
+### 7.3. Relación entre tipo de ataque y acción defensiva
+
+```{python}
+tabla_grafico = pd.crosstab(
+    df["Attack Type"],
+    df["Action Taken"]
+)
+
+plt.figure(figsize=(10, 6))
+sns.heatmap(
+    tabla_grafico,
+    annot=True,
+    fmt="g",
+    cmap="Reds"
+)
+
+plt.title("Relación entre tipo de ataque y acción defensiva")
+plt.xlabel("Acción aplicada")
+plt.ylabel("Tipo de ataque")
+plt.tight_layout()
+plt.show()
+```
+
+**Interpretación:** el mapa de calor muestra el número de registros en cada combinación de tipo de ataque y acción. Los valores más altos indican más registros en esa combinación, pero no permiten concluir por sí solos que el bloqueo haya sido correcto o efectivo.
+
+### 7.4. Gráfico interactivo con Plotly
+
+El siguiente gráfico permite explorar la relación entre la longitud del paquete y la puntuación de anomalía. Al pasar el cursor sobre los puntos se muestran detalles del registro y se puede activar o desactivar cada categoría en la leyenda.
+
+```{python}
+import plotly.express as px
+
+# Limitamos el número de puntos para que el gráfico sea fluido en el navegador.
+columnas_plotly = [
+    "Packet Length", "Anomaly Scores", "Attack Type",
+    "Severity Level", "Action Taken"
+]
+
+muestra_plotly = df[columnas_plotly].dropna().sample(
+    n=min(5000, df[columnas_plotly].dropna().shape[0]),
+    random_state=42
+)
+
+fig = px.scatter(
+    muestra_plotly,
+    x="Packet Length",
+    y="Anomaly Scores",
+    color="Attack Type",
+    hover_data=["Severity Level", "Action Taken"],
+    title="Relación entre longitud del paquete y puntuación de anomalía",
+    labels={
+        "Packet Length": "Longitud del paquete",
+        "Anomaly Scores": "Puntuación de anomalía",
+        "Attack Type": "Tipo de ataque"
+    },
+    opacity=0.65
+)
+
+fig.update_layout(
+    template="plotly_white",
+    legend_title_text="Tipo de ataque"
+)
+fig.show()
+```
+
+**Interpretación:** el gráfico permite observar cómo se distribuyen los registros según el tamaño del paquete y la puntuación de anomalía. La interacción facilita aislar categorías y consultar detalles. Una posible relación visual debe investigarse con más datos antes de considerarla una regla de detección.
+
+## 8. Interpretación desde la Administración de Sistemas
+
+Los resultados permiten estudiar la distribución de los tipos de ataque, los niveles de severidad y las acciones defensivas registradas. Desde la perspectiva de un administrador de sistemas, este análisis puede servir como punto de partida para:
+
+- Revisar las políticas del cortafuegos y comprobar que se ajustan a los servicios que deben estar expuestos.
+- Investigar las categorías de eventos más frecuentes y verificar si corresponden a actividad esperada.
+- Priorizar la revisión de los registros clasificados con severidad alta.
+- Contrastar las acciones registradas (`Blocked`, `Ignored` o `Logged`, según los valores presentes) con las políticas de seguridad.
+- Establecer procedimientos de monitorización, conservación de logs y respuesta ante incidentes.
+- Investigar los eventos que presenten puntuaciones de anomalía elevadas junto con otras evidencias técnicas.
+
+**Limitación del análisis:** el dataset es sintético y las asociaciones encontradas no demuestran causalidad ni describen necesariamente una red corporativa real. Las conclusiones deben entenderse dentro de los datos analizados.
+
+## 9. Conclusiones
+
+El proyecto demuestra cómo Python y Pandas permiten cargar, explorar, agrupar, filtrar y resumir información relacionada con la ciberseguridad. Las visualizaciones estáticas e interactivas ayudan a comunicar los resultados, mientras que la interpretación técnica conecta el análisis con tareas propias de la administración de sistemas.
+
+Quarto integra el código, las tablas, los gráficos y las explicaciones en un informe reproducible. Como trabajo futuro, sería interesante incorporar una segunda fuente independiente y compatible, enriquecer el análisis temporal y contrastar los patrones con registros reales debidamente anonimizados.
+
+## 10. Fuentes consultadas
+
+- [Kaggle - Cyber Security Attacks](https://www.kaggle.com/datasets/teamincribo/cyber-security-attacks)
+- [Documentación oficial de Pandas](https://pandas.pydata.org/docs/)
+- [Documentación oficial de Matplotlib](https://matplotlib.org/stable/)
+- [Documentación oficial de Seaborn](https://seaborn.pydata.org/)
+- [Documentación oficial de Plotly Python](https://plotly.com/python/)
+- [Documentación oficial de Quarto](https://quarto.org/docs/)
+- [Documentación de KaggleHub](https://github.com/Kaggle/kagglehub)
